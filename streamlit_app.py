@@ -1,32 +1,35 @@
+import time
 import streamlit as st
 from pymongo import MongoClient
-import time
 
+# Create a progress bar
+progress_bar = st.progress(0)
+
+# Step 1: Connect to MongoDB
 st.write("Connecting to MongoDB...")
+client = MongoClient(st.secrets["mongodb"]["uri"])
+progress_bar.progress(30)
 
-try:
-    # Start a progress bar
-    progress = st.progress(0)
+# Step 2: Access the database
+st.write("Accessing database...")
+db = client["mediation_db"]
+progress_bar.progress(60)
 
-    # Simulate connection attempt and progress
-    for i in range(10):
-        progress.progress(i * 10)
-        time.sleep(0.5)
+# Step 3: Query the collections
+st.write("Querying the 'conversations' collection...")
+collection = db["conversations"]
+documents = list(collection.find())
+progress_bar.progress(90)
 
-    # MongoDB connection with timeout
-    client = MongoClient(st.secrets["mongodb"]["uri"], serverSelectionTimeoutMS=5000)
-    client.admin.command('ping')
-    st.write("Connected to MongoDB!")
+# Display the documents
+if documents:
+    st.write(f"Documents: {documents}")
+else:
+    st.write("No documents found.")
+progress_bar.progress(100)
 
-    # Access the database
-    db = client['mediation_db']
-    st.write("Accessing database...")
+st.write("Operation completed!")
 
-    collections = db.list_collection_names()
-    st.write("Collections in the database:", collections)
-
-except Exception as e:
-    st.error(f"An error occurred: {e}")
 
 
 
