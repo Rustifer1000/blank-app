@@ -1,15 +1,20 @@
 import streamlit as st
 from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure, OperationFailure
 import time
 
 st.write("Connecting to MongoDB...")
 
 try:
-    # Establish MongoDB connection
-    client = MongoClient(st.secrets["mongodb"]["uri"])
+    # Start a progress bar
+    progress = st.progress(0)
 
-    # Optional: Use ping command to check connection
+    # Simulate connection attempt and progress
+    for i in range(10):
+        progress.progress(i * 10)
+        time.sleep(0.5)
+
+    # MongoDB connection with timeout
+    client = MongoClient(st.secrets["mongodb"]["uri"], serverSelectionTimeoutMS=5000)
     client.admin.command('ping')
     st.write("Connected to MongoDB!")
 
@@ -17,15 +22,11 @@ try:
     db = client['your_database_name']
     st.write("Accessing database...")
 
-    # Example operation: List collections
     collections = db.list_collection_names()
     st.write("Collections in the database:", collections)
 
-except ConnectionFailure as e:
-    st.error(f"MongoDB connection failed: {e}")
-except OperationFailure as e:
-    st.error(f"Operation failed: {e}")
 except Exception as e:
-    st.error(f"An unexpected error occurred: {e}")
+    st.error(f"An error occurred: {e}")
+
 
 
