@@ -19,7 +19,7 @@ try:
     st.write("Connected to MongoDB!")
 
     # Access the database
-    db = client['mediation_db.conversations']
+    db = client['mediation_db']
     st.write("Accessing database...")
 
     collections = db.list_collection_names()
