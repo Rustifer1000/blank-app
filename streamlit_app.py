@@ -1,25 +1,15 @@
 import streamlit as st
 from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
 
-# Access credentials from Streamlit secrets
-username = st.secrets["mongodb"]["username"]
-password = st.secrets["mongodb"]["password"]
-cluster_url = st.secrets["mongodb"]["cluster_url"]
-dbname = st.secrets["mongodb"]["dbname"]
+# Access MongoDB URI from Streamlit secrets
+mongodb_uri = st.secrets["mongodb"]["uri"]
 
-# Construct the connection string
-connection_string = f"mongodb+srv://{username}:{password}@{cluster_url}/{dbname}?retryWrites=true&w=majority"
+# Create a MongoDB client using the URI directly
+client = MongoClient(mongodb_uri)
 
-# Try connecting to MongoDB Atlas
-try:
-    client = MongoClient(connection_string)
-    db = client[dbname]
-    # Ping the database (list collections as a basic test)
-    collections = db.list_collection_names()
-    st.success("Successfully connected to MongoDB Atlas!")
-    st.write("Collections in the database:", collections)
-except ConnectionFailure as e:
-    st.error(f"Could not connect to MongoDB Atlas: {e}")
-except Exception as e:
-    st.error(f"An error occurred: {e}")
+# Access the database (replace 'your_database_name' with actual DB name)
+db = client['your_database_name']
+
+# Test: List collections in the database
+st.write(db.list_collection_names())
+
